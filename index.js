@@ -1,21 +1,30 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
-app.use(express.json());
+
 const VERIFY_TOKEN = "kapela123";
 
+app.use(bodyParser.json());
+
+// HII NDIO META INATAFUTA
 app.get('/webhook', (req, res) => {
   if (req.query['hub.verify_token'] === VERIFY_TOKEN) {
+    console.log('Webhook verified');
     res.send(req.query['hub.challenge']);
-    console.log('Meta Verified Kapela Webhook');
   } else {
     res.sendStatus(403);
   }
 });
 
+// HII NDIO ITAPOKEA MESSAGES
 app.post('/webhook', (req, res) => {
-  console.log('Ujumbe mpya Kapela Wilondja:', req.body);
+  console.log('Ujumbe umefika:', req.body);
   res.sendStatus(200);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Kapela Webhook live'));
+// Homepage ya kawaida
+app.get('/', (req, res) => {
+  res.send('Kapela Webhook Iko Live');
+});
+
+app.listen(process.env.PORT || 3000, () => console.log('Server Live'));
