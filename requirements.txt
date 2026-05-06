@@ -3,3 +3,4 @@ requests==2.31.0
 gunicorn==21.2.0
 google-generativeai==0.3.2
 protobuf==3.20.3
+setuptools==68.2
