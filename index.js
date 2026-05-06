@@ -23,7 +23,7 @@ app.post('/webhook', (req, res) => {
         } else if (userMessage.includes('unapatikana wapi') || userMessage.includes('location')) {
           response = { "text": "Napatikana Nyarugusu\nKwa mawasiliano zaidi: WhatsApp +255762237432" };
         } else if (userMessage.includes('namba') || userMessage.includes('whatsapp')) {
-          response = { "text": "Namba yangu ya WhatsApp: +255762237432\nSave ukinikuta online tuongee zaidi 📱" };
+          response = { "text": "Namba yangu ya WhatsApp: +255762237432\nSave ukinikuta online tuongee zaidi" };
         } else if (userMessage.includes('asante') || userMessage.includes('shukran')) {
           response = { "text": "Karibu sana mkuu 🙏\nNipo hapa kukuhudumia wakati wowote" };
         } else {
