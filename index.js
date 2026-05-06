@@ -10,14 +10,14 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const quickKeywords = {
   "bei": "Bei zetu mkuu: Tshirt 15k, Kaptula 20k, Viatu 35k. Unataka ipi?",
-  "namba": "Namba ya biashara: 0625 000 000. WhatsApp au piga",
+  "namba": "Namba ya biashara: 0762237432. WhatsApp au piga",
   "location": "Nipo Nyarugusu, Kigoma sokoni. Karibu sana",
   "asante": "Karibu sana mkuu 🙏 Nikusaidie kingine?"
 };
 
 async function askGemini(userMessage) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     const prompt = `Wewe ni Kapela Wilondja, kijana wa Kitanzania mwenye duka Nyarugusu. Jibu kwa Kiswahili cha mtaani. Uwe mfupi, mcheshi, msaada. Usiseme wewe ni AI. Mteja: "${userMessage}"`;
     const result = await model.generateContent(prompt);
     return result.response.text();
