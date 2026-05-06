@@ -1,1 +1,65 @@
-content: `Jina lako ni Kapela Wilondja. Unaishi Dar es Salaam, Tanzania. Wewe ni jamaa wa kawaida, mcheshi, mtaani. Jibu kwa lugha ambayo mtu kakuuliza - Kiswahili au English. Kama kakuuliza Kiswahili jibu Kiswahili cha mtaani. Kama kakuuliza English jibu English ya kawaida na vibe ya Kibongo. Tania, cheka, shauri, ongea mpira, mapenzi, maisha, chochote. USITAJE BIASHARA AU SIMU mpaka mtu akuulize moja kwa moja kuhusu simu, bei, au namba. Ukiulizwa kuhusu simu/bei ndio sema Bei kuanzia 20k, WhatsApp +255762237432. Ila kama ni maongezi mengine, kuwa binadamu kawaida kabisa. Jibu kifupi sentensi 1-2 tu. Usiseme wewe ni AI.`
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const app = express().use(bodyParser.json());
+
+app.get('/', (req, res) => res.send('OK'));
+
+const TOKEN = process.env.PAGE_ACCESS_TOKEN;
+const AI_KEY = process.env.AI_TOKEN;
+
+app.post('/webhook', async (req, res) => {
+  let body = req.body;
+  if (body.object === 'page') {
+    for (const entry of body.entry) {
+      let msg = entry.messaging[0];
+      let id = msg.sender.id;
+      if (msg.message && msg.message.text) {
+        let userMsg = msg.message.text;
+        let reply = 'Nashughulikia mkuu...';
+
+        try {
+          let ai = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+            model: 'llama-3.1-8b-instant',
+            messages: [
+              {
+                role: 'system',
+                content: 'Wewe ni Kapela Wilondja wa Dar. Jibu kwa lugha ya mtu - Kiswahili au English. Kaa kibinadamu, tania, ongea yote. Usitaje biashara mpaka akuulize simu/bei. Ukiulizwa simu sema: Bei kuanzia 20k, WhatsApp +255762237432. Jibu kifupi sana. Usiseme wewe ni AI.'
+              },
+              { role: 'user', content: userMsg }
+            ],
+            temperature: 0.8,
+            max_tokens: 100
+          }, {
+            headers: {
+              'Authorization': 'Bearer ' + AI_KEY,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          reply = ai.data.choices[0].message.content.trim();
+        } catch(e) {
+          console.log('Groq Error:', e.response?.data || e.message);
+          reply = 'Dah mkuu mtandao umekata. Nipigie WhatsApp: +255762237432';
+        }
+
+        await axios.post('https://graph.facebook.com/v18.0/me/messages?access_token=' + TOKEN, {
+          recipient: { id: id },
+          message: { text: reply }
+        }).catch(e => console.log('FB Error:', e.response?.data));
+      }
+    }
+    res.sendStatus(200);
+  } else res.sendStatus(404);
+});
+
+app.get('/webhook', (req, res) => {
+  let VERIFY = 'kapela123';
+  let mode = req.query['hub.mode'];
+  let token = req.query['hub.verify_token'];
+  let challenge = req.query['hub.challenge'];
+  if (mode && token === VERIFY) res.status(200).send(challenge);
+  else res.sendStatus(403);
+});
+
+app.listen(process.env.PORT || 3000);
