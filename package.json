@@ -1,16 +1,24 @@
 {
-  "name": "kapela-bot-v2",
+  "name": "kapela-bot",
   "version": "1.0.0",
-  "description": "Kapela WhatsApp Bot V500 Live",
+  "description": "WhatsApp Bot for Kapela using Meta API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "axios": "^1.6.2"
-  }
+    "axios": "^1.6.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "meta",
+    "kapela"
+  ],
+  "author": "Mkuu Kapela",
+  "license": "MIT"
 }
