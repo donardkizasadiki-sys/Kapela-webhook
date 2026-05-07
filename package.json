@@ -1,17 +1,17 @@
 {
-  "name": "kapela-webhook",
+  "name": "kapela-bot",
   "version": "1.0.0",
-  "description": "Kapela Wilondja Messenger Bot",
+  "description": "Kapela Wilondja - Mtaani Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "axios": "^1.6.2",
-    "@google/generative-ai": "^0.24.1"
+    "body-parser": "^1.20.2",
+    "axios": "^1.6.0"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">=18.0.0"
   }
 }
