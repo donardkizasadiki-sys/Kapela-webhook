@@ -1,7 +1,6 @@
 {
   "name": "kapela-bot",
   "version": "1.0.0",
-  "description": "Kapela Wilondja - Mtaani Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -12,6 +11,6 @@
     "axios": "^1.6.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   }
 }
