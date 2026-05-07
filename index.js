@@ -46,7 +46,6 @@ app.post('/webhook', async (req, res) => {
 async function handleMessage(sender_psid, msg) {
   let response = "";
 
-  // SALAMU NA HABARI
   if (msg.includes('habari') || msg.includes('mambo') || msg.includes('vipi') || msg.includes('niaje')) {
     const replies = [
       "Poa sana mkuu. Wewe je, umeamkaje?",
@@ -56,8 +55,6 @@ async function handleMessage(sender_psid, msg) {
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
   }
-  
-  // SOKA NA MIPIRA
   else if (msg.includes('soka') || msg.includes('mpira') || msg.includes('simba') || msg.includes('yanga') || msg.includes('arsenal')) {
     const replies = [
       "Aisee mkuu soka balaa 😂 Juzi Simba alikula kichapo. Wewe team gani?",
@@ -67,9 +64,7 @@ async function handleMessage(sender_psid, msg) {
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
   }
-  
-  // CHAKULA NA NJA
-  else if (msg.includes('njaa') || msg.includes('chakula') || msg.includes('kula') || msg.includes('wapi')) {
+  else if (msg.includes('njaa') || msg.includes('chakula') || msg.includes('kula')) {
     const replies = [
       "Aisee usiniambie njaa 😂 Mimi naota wali nyama. Wewe umekula?",
       "Chakula ni uhai mkuu. Leo nakula chips kuku. Wewe mpango gani?",
@@ -78,9 +73,7 @@ async function handleMessage(sender_psid, msg) {
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
   }
-  
-  // HALI YA HEWA NA MVUA
-  else if (msg.includes('mvua') || msg.includes('jua') || msg.includes('baridi') || msg.includes('hali ya hewa')) {
+  else if (msg.includes('mvua') || msg.includes('jua') || msg.includes('baridi')) {
     const replies = [
       "Huku kunanyesha kama balaa mkuu ☔ Umejifunika?",
       "Jua limezidi leo. Nimeyeyuka kabisa. Huko vipi?",
@@ -89,6 +82,58 @@ async function handleMessage(sender_psid, msg) {
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
   }
+  else if (msg.includes('weekend') || msg.includes('mapumziko') || msg.includes('party')) {
+    const replies = [
+      "Weekend ndio imefika mkuu! Mpango gani? Mimi nipo free kabisa 😂",
+      "Mapumziko yanaitwa. Tupeleke wapi? Nimechoka kulala nyumbani",
+      "Party gani leo? Nipe location nifike chap",
+      "Burudani lazima mkuu. Maisha ni mafupi. Unataka tuende wapi?"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+  }
+  else if (msg.includes('nimechoka') || msg.includes('stress') || msg.includes('shida') || msg.includes('kazi')) {
+    const replies = [
+      "Pole sana mkuu 😔 Maisha ndivyo yalivyo. Pumzika kidogo. Niko hapa kukusikiliza",
+      "Stress achana nayo. Njoo tucheke kidogo. Unataka nikupe story?",
+      "Kazi inachosha sana. Jipe break mkuu. Ustawi wa akili muhimu",
+      "Shida zipite tu. Kesho ni siku nyingine. Usijali sana"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+  }
+  else if (msg.includes('asante') || msg.includes('shukran') || msg.includes('thanks')) {
+    response = "Karibu sana mkuu 😊 Tupo pamoja. Usisite kuniandikia tena";
+  }
+  else if (msg.includes('bye') || msg.includes('lala') || msg.includes('usiku mwema')) {
+    response = "Usiku mwema mkuu. Lala salama. Tutaonana kesho 😴";
+  }
+  else if (msg.includes('poa') || msg.includes('safi') || msg.includes('freshi') || msg.includes('sawa')) {
+    response = "Safi sana 😂 Tuko pamoja. Endelea kufurahia siku yako";
+  }
+  else {
+    const replies = [
+      "Aisee mkuu 😂 Nimekusikia. Nambie tena kidogo nielewe vizuri",
+      "Duh umenichanganya kiasi. Ongea lugha ya mtaani nielewe chap",
+      "Sijasoma vizuri hapo. Rudia tena mkuu",
+      "Nipo hapa mkuu. Tuongee tu kama marafiki. Unasemaje?"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+  }
   
-  // WEEKEND NA BURUDANI
-  else if (msg.includes('weekend') || msg.includes('mapumziko') || msg.includes('party') || msg.includes
+  await callSendAPI(sender_psid, response);
+}
+
+// Tuma Jibu Messenger
+async function callSendAPI(sender_psid, response) {
+  const request_body = {
+    recipient: { id: sender_psid },
+    message: { text: response }
+  };
+
+  try {
+    await axios.post(`https://graph.facebook.com/v18.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, request_body);
+  } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
+  }
+}
+
+app.listen(PORT, () => console.log(`Kapela Mtaani yuko Live - Port ${PORT}`));
