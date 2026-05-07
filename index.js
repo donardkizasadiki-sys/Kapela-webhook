@@ -12,8 +12,7 @@ const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Anzisha Gemini - MODEL IMARA HAIFI
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 // Webhook Verification
 app.get('/webhook', (req, res) => {
