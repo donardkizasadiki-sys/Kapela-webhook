@@ -5,49 +5,165 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// KAPELA BOT V500
+// KAPELA BOT V500 - DIALOGUE MASTER
 const KapelaV500 = {
   version: "5.0.0",
   botName: "Kapela Bot",
   author: "Kapela Wilondja",
 
-  intents: {
-    rasmi_chatbot: {
-      keywords: ["habari yako","unaendeleaje","niko poa","asante sana","karibu sana","wewe pia","baadaye"],
-      responses: { greeting: "Habari yako! Mimi ni Kapela Bot. Niko hapa kukusaidia. Unaendeleaje leo?" }
+  patterns: {
+    // 1. RASMI - CHATBOT YA KIRAIFIKI
+    rasmi: {
+      keywords: ["habari", "unaendeleaje", "niko poa", "asante", "karibu", "baadaye", "swali", "salama", "wewe je"],
+      flows: [
+        {
+          triggers: ["habari", "unaendeleaje", "mambo", "vipi"],
+          replies: [
+            "Habari yako! Niko hapa kukusaidia. Unaendeleaje leo?",
+            "Salama mkuu! Nipo tayari kukusaidia. Vipi wewe?"
+          ]
+        },
+        {
+          triggers: ["salama", "poa", "sijambo", "wewe je", "asante"],
+          replies: [
+            "Mimi niko poa tu, niko tayari kukusaidia. Una swali lolote au kuna kitu ningekufanyia?",
+            "Nipo salama kabisa. Naweza kukusaidia nini leo mkuu?"
+          ]
+        },
+        {
+          triggers: ["swali", "nina swali", "naomba", "saidie", "mada"],
+          replies: [
+            "Sawa, nimekupata. Niambie swali lako kuhusu nini?",
+            "Poa, niko hapa. Tupe mada unayotaka kujua zaidi."
+          ]
+        },
+        {
+          triggers: ["asante sana", "umenisaidia", "shukran"],
+          replies: [
+            "Karibu sana! Ni furaha yangu kukusaidia. Kama utahitaji msaada mwingine, usisite kuniuliza. Kuwa na siku njema!",
+            "Shukran pia mkuu. Niko hapa wakati wowote. Baadaye! Wewe pia!"
+          ]
+        }
+      ]
     },
+
+    // 2. KIFAMILIA - HESHIMA NA UPENDO
     kifamilia: {
-      keywords: ["hodi nyumbani","karibu mama","umechelewa","usiku mwema","lala salama"],
-      responses: { greeting: "Hodi nyumbani! Nimerudi. Karibu Kapela Bot." }
+      keywords: ["hodi", "karibu mama", "umechelewa", "usiku mwema", "lala salama", "baba", "mama", "kazini", "shule"],
+      flows: [
+        {
+          triggers: ["hodi", "nimerudi"],
+          replies: [
+            "Hodi nyumbani! Nimerudi. Karibu Mama! Umechelewa leo kidogo. Habari za kazini?",
+            "Karibu nyumbani. Leo umechelewa sana. Kila la heri?"
+          ]
+        },
+        {
+          triggers: ["salama mwanangu", "kazini", "foleni", "asante mungu"],
+          replies: [
+            "Salama mwanangu, asante Mungu. Leo kulikuwa na foleni kubwa. Umejifunzaje?",
+            "Nipo salama. Wewe umemaliza kazi za shule?"
+          ]
+        },
+        {
+          triggers: ["nimejifunza", "kazi za shule", "nimemaliza", "vizuri"],
+          replies: [
+            "Nzuri sana! Ndiyo hivyo, uwe unajitahidi kila wakati. Baba amerudi?",
+            "Hongera sana mwanangu. Baba yuko wapi?"
+          ]
+        },
+        {
+          triggers: ["baba amerudi", "sebuleni", "habari"],
+          replies: [
+            "Sawa. Nitaenda kubadilisha nguo halafu nikaongee naye. Na wewe usisahau kunywa maziwa kabla ya kulala, sawa?",
+            "Poa. Nitampitia huko. Wewe maliza homework zako."
+          ]
+        },
+        {
+          triggers: ["usiku mwema", "lala salama", "kulala"],
+          replies: [
+            "Usiku mwema mwanangu, lala salama. Usisahau kunywa maziwa kabla ya kulala, sawa?",
+            "Lala unono. Tutaonana kesho asubuhi."
+          ]
+        }
+      ]
     },
+
+    // 3. KIMTAANI - LUGHA YA WATU
     kimtaani: {
-      keywords: ["mambo vipi","uko poa","poa sana","mkuu","demu","mkwanja","bize","msoto","bata"],
-      responses: { greeting: "Mambo vipi, mkuu? Uko poa? Mimi Kapela Bot nipo hapa." }
+      keywords: ["mambo vipi", "uko poa", "msoto", "mkwanja", "bize", "demu", "kariakoo", "buguruni", "bata", "chidi", "juma", "mzee"],
+      flows: [
+        {
+          triggers: ["mambo vipi", "uko poa", "vipi mkuu", "poa sana"],
+          replies: [
+            "Mambo vipi, Chidi? Uko poa? Nipo hapa nashangaa tu maisha. Wewe je?",
+            "Poa sana, Juma! Nipo tu na msoto wangu, kama kawaida! Hujapotea sana siku hizi?"
+          ]
+        },
+        {
+          triggers: ["nasaka mkwanja", "bize", "nipo tu", "maisha", "sikupotea"],
+          replies: [
+            "Nipo tu, mzee. Nasaka mkwanja hapa na pale. Sikupotea, nilikuwa bize kidogo. Vipi, umeona yule demu mpya kwenye duka la Kariakoo?",
+            "Maisha yanapambana mkuu. Wewe bize zako zikoje? Umemuona yule wa Kariakoo?"
+          ]
+        },
+        {
+          triggers: ["demu", "kariakoo", "mrembo", "buguruni"],
+          replies: [
+            "(Anacheka) Wewe Chidi, hutabadilika! Nimemuona, mrembo kweli. Lakini wewe umesahau yule wa kule Buguruni?",
+            "Aisee demu wenu wa Kariakoo anakula bata mwingi. Huyo wa Buguruni vipi? Bado yupo?"
+          ]
+        },
+        {
+          triggers: ["nenda", "tukutane", "kesho", "meseji", "simu"],
+          replies: [
+            "Sawa mzee, nenda zako! Ukinipigia simu, usisahau kunitumia meseji! Tukutane kesho!",
+            "Poa mkuu. Twende tukasake mkwanja. Usisahau kuni-text! Bata tuone kesho."
+          ]
+        }
+      ]
     }
   },
 
-  detectIntent: function(message) {
-    if (!message) return "default";
+  detectStyle: function(message) {
     const msg = message.toLowerCase();
-    if (this.intents.kimtaani.keywords.some(kw => msg.includes(kw))) return "kimtaani";
-    if (this.intents.kifamilia.keywords.some(kw => msg.includes(kw))) return "kifamilia";
-    if (this.intents.rasmi_chatbot.keywords.some(kw => msg.includes(kw))) return "rasmi_chatbot";
-    return "rasmi_chatbot";
+    if (this.patterns.kimtaani.keywords.some(kw => msg.includes(kw))) return "kimtaani";
+    if (this.patterns.kifamilia.keywords.some(kw => msg.includes(kw))) return "kifamilia";
+    if (this.patterns.rasmi.keywords.some(kw => msg.includes(kw))) return "rasmi";
+    return "rasmi";
+  },
+
+  getReply: function(message) {
+    const style = this.detectStyle(message);
+    const pattern = this.patterns[style];
+    const msg = message.toLowerCase();
+
+    for (let flow of pattern.flows) {
+      if (flow.triggers.some(trigger => msg.includes(trigger))) {
+        return flow.replies[Math.floor(Math.random() * flow.replies.length)];
+      }
+    }
+
+    const defaults = [
+      "Sawa mkuu, nimekupata. Endelea kunipa muktadha zaidi.",
+      "Niko hapa mkuu. Niambie zaidi nisaidieje?",
+      "Kapela Bot nipo. Semaje sasa?"
+    ];
+    return defaults[Math.floor(Math.random() * defaults.length)];
   },
 
   handleMessage: function(userMessage) {
-    const intent = this.detectIntent(userMessage);
-    const responses = this.intents[intent]?.responses || this.intents.rasmi_chatbot.responses;
-    return responses.greeting || "Sawa mkuu, nimekupata. Niko tayari kukusaidia.";
+    return this.getReply(userMessage);
   }
 };
 
-// TOKENS - WEKA ZAKO HAPA
+// TOKENS
 const VERIFY_TOKEN = "kapela_v500_secret";
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN; // Weka Render Env
-const MESSENGER_TOKEN = process.env.MESSENGER_TOKEN; // Weka Render Env
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const MESSENGER_TOKEN = process.env.MESSENGER_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// 1. VERIFY WEBHOOK - WHATSAPP & MESSENGER
+// VERIFY WEBHOOK
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -61,7 +177,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// 2. RECEIVE MESSAGES - WHATSAPP & MESSENGER
+// RECEIVE MESSAGES - MESSENGER + WHATSAPP
 app.post('/webhook', (req, res) => {
   const body = req.body;
 
@@ -77,8 +193,6 @@ app.post('/webhook', (req, res) => {
           const from = message.from;
           const msgBody = message.text.body;
           const reply = KapelaV500.handleMessage(msgBody);
-
-          // Tuma jibu WhatsApp
           await sendWhatsAppMessage(from, reply);
         });
       }
@@ -95,8 +209,6 @@ app.post('/webhook', (req, res) => {
       if (webhook_event.message) {
         const msgBody = webhook_event.message.text;
         const reply = KapelaV500.handleMessage(msgBody);
-
-        // Tuma jibu Messenger
         sendMessengerMessage(sender_psid, reply);
       }
     });
@@ -113,7 +225,7 @@ async function sendWhatsAppMessage(to, text) {
   try {
     await axios({
       method: 'POST',
-      url: `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
+      url: `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
       headers: {
         'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
         'Content-Type': 'application/json'
@@ -124,7 +236,7 @@ async function sendWhatsAppMessage(to, text) {
         text: { body: text }
       }
     });
-    console.log('WhatsApp message sent');
+    console.log('WhatsApp sent');
   } catch (error) {
     console.log('WhatsApp Error:', error.response?.data);
   }
@@ -142,7 +254,7 @@ function sendMessengerMessage(sender_psid, text) {
     url: `https://graph.facebook.com/v18.0/me/messages?access_token=${MESSENGER_TOKEN}`,
     data: request_body
   }).then(() => {
-    console.log('Messenger message sent');
+    console.log('Messenger sent');
   }).catch((error) => {
     console.log('Messenger Error:', error.response?.data);
   });
