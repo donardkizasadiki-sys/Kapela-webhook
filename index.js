@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 3000;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
-// Webhook Verification
+const userMemory = {};
+const userTopics = {}; // Anakumbuka topic ya kila mtu
+
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -22,7 +24,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Webhook - Kupokea Messages
 app.post('/webhook', async (req, res) => {
   const body = req.body;
 
@@ -32,7 +33,7 @@ app.post('/webhook', async (req, res) => {
       const sender_psid = webhook_event.sender.id;
       
       if (webhook_event.message && webhook_event.message.text) {
-        const userMessage = webhook_event.message.text.toLowerCase();
+        const userMessage = webhook_event.message.text;
         await handleMessage(sender_psid, userMessage);
       }
     }
@@ -42,79 +43,168 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// Kapela Wilondja - MAONGEZI YA MTAANI TU
-async function handleMessage(sender_psid, msg) {
+// KAPELA V3.0 - ANAJIBU KILA MTU DUNIANI
+async function handleMessage(sender_psid, rawMsg) {
+  const msg = rawMsg.toLowerCase().trim();
   let response = "";
+  
+  // Memory
+  if (!userMemory[sender_psid]) userMemory[sender_psid] = [];
+  userMemory[sender_psid].push(msg);
+  if (userMemory[sender_psid].length > 5) userMemory[sender_psid].shift();
+  const lastMsg = userMemory[sender_psid][userMemory[sender_psid].length - 2] || "";
 
-  if (msg.includes('habari') || msg.includes('mambo') || msg.includes('vipi') || msg.includes('niaje')) {
+  // 1. SALAMU - LUGHA ZOTE
+  if (msg.match(/\b(hi|hello|hey|hola|bonjour|habari|mambo|vipi|niaje|salam|jambo)\b/)) {
     const replies = [
-      "Poa sana mkuu. Wewe je, umeamkaje?",
-      "Niko salama kabisa. Dunia inakwendaje huko?",
-      "Freshi mkuu. Leo umeamua kunikumbuka 😂",
-      "Mambo poa. Wewe vipi, umelala vizuri?"
+      "Hey! Nice to meet you 😊 How can I help you today?",
+      "Habari yako? Karibu sana. Tuongee kuhusu nini?",
+      "Hello! I'm Kapela. What brings you here today?",
+      "Mambo vipi? Niko hapa kukusikiliza. Unasemaje?"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'greeting';
   }
-  else if (msg.includes('soka') || msg.includes('mpira') || msg.includes('simba') || msg.includes('yanga') || msg.includes('arsenal')) {
+  
+  // 2. STORY & UTANI - KILA MTU ANAPENDA
+  else if (msg.match(/\b(story|stori|hadithi|joke|utani|cheka|funny|mzaha|laugh)\b/)) {
+    const stories = [
+      "😂 Ok listen: Yesterday I saw a cat chasing a dog. I thought the world was ending. Then I realized the dog stole the cat's fish 😂😂",
+      "Story time: I went to buy bread. The shopkeeper said '5 dollars'. I said 'I only have 2'. He said 'take half bread'. I took it and ran 😂",
+      "Joke: Why don't scientists trust atoms? Because they make up everything! 😂 Got it?",
+      "Aisee sikiliza: Jamaa alienda kwa daktari. Daktari: 'Una matatizo'. Jamaa: 'Naona, ndio maana nimekuja kwako' 😂😂"
+    ];
+    response = stories[Math.floor(Math.random() * stories.length)];
+    userTopics[sender_psid] = 'story';
+  }
+  
+  // 3. MAPENZI & MAHUSIANO
+  else if (msg.match(/\b(love|mapenzi|relationship|crush|boyfriend|girlfriend|mchumba|nampenda|heartbreak)\b/)) {
     const replies = [
-      "Aisee mkuu soka balaa 😂 Juzi Simba alikula kichapo. Wewe team gani?",
-      "Mpira huu unaniumiza kichwa. Yanga wameanza visasi tena. Unasapoti wapi?",
-      "EPL imechacha mkuu. Arsenal wanapwaya. Wewe unaona nani atabeba kikombe?",
-      "Soka bila stress haiwezekani 😅 Leo kuna game? Nambie nikuje tuangalie pamoja"
+      "Love is complicated 😅 Are you happy in love or is it giving you stress?",
+      "Aisee mapenzi bana 😂 Umeanguka au umeangushwa? Nambie nikusikilize",
+      "Relationships need patience. Unataka ushauri au tuongee tu?",
+      "Heartbreak ni ngumu sana 😔 Lakini utapona. Nipo hapa kukusikiliza. Unataka kuongea?"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'love';
   }
-  else if (msg.includes('njaa') || msg.includes('chakula') || msg.includes('kula')) {
+  
+  // 4. KAZI & ELIMU
+  else if (msg.match(/\b(job|work|kazi|school|shule|study|exam|mtihani|university|career|ajira)\b/)) {
     const replies = [
-      "Aisee usiniambie njaa 😂 Mimi naota wali nyama. Wewe umekula?",
-      "Chakula ni uhai mkuu. Leo nakula chips kuku. Wewe mpango gani?",
-      "Njaa inanisumbua pia. Tuchangie order? 😂",
-      "Kwenye kula mimi sichelewi. Uko wapi? Tukutane sehemu"
+      "Work can be stressful 😅 What's your job? Or are you looking for one?",
+      "Elimu ni ufunguo mkuu. Unasoma nini? Au umemaliza?",
+      "Exams zinakaribia? Usijali, jipange tu. Unataka tips za kusoma?",
+      "Kazi gani hiyo mkuu? Inakulipa vizuri au unateseka tu? 😂"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'work';
   }
-  else if (msg.includes('mvua') || msg.includes('jua') || msg.includes('baridi')) {
+  
+  // 5. AFYA & MAISHA
+  else if (msg.match(/\b(health|afya|mgonjwa|sick|hospital|doctor|stress|depressed|sad|huzuni)\b/)) {
     const replies = [
-      "Huku kunanyesha kama balaa mkuu ☔ Umejifunika?",
-      "Jua limezidi leo. Nimeyeyuka kabisa. Huko vipi?",
-      "Baridi inaninyima usingizi 😂 Umevaa sweta?",
-      "Hali ya hewa inacheza na akili za watu. Leo joto, kesho mvua"
+      "Pole sana 😔 Afya ni muhimu. Umewahi kwenda hospitali? Nipo kukusikiliza",
+      "If you're feeling sad, it's okay to talk about it. I'm here. What's bothering you?",
+      "Stress inaua mkuu. Pumzika, kunywa maji, ongea na mtu. Unataka tuongee?",
+      "Health first! Umefanya mazoezi leo? Au unakula vizuri?"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'health';
   }
-  else if (msg.includes('weekend') || msg.includes('mapumziko') || msg.includes('party')) {
+  
+  // 6. PESA & BIASHARA - GENERAL
+  else if (msg.match(/\b(money|pesa|business|biashara|rich|tajiri|maskini|investment|uwekezaji|budget)\b/)) {
     const replies = [
-      "Weekend ndio imefika mkuu! Mpango gani? Mimi nipo free kabisa 😂",
-      "Mapumziko yanaitwa. Tupeleke wapi? Nimechoka kulala nyumbani",
-      "Party gani leo? Nipe location nifike chap",
-      "Burudani lazima mkuu. Maisha ni mafupi. Unataka tuende wapi?"
+      "Money is important but not everything 😊 Are you planning to invest or save?",
+      "Biashara inahitaji akili. Una wazo gani? Nikuambie changamoto zake?",
+      "Kila mtu anataka kuwa tajiri 😂 Lakini anza kidogo kidogo. Unataka tips?",
+      "Budget ni muhimu sana. Unatumia pesa zako vizuri au zinaisha tu? 😅"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'money';
   }
-  else if (msg.includes('nimechoka') || msg.includes('stress') || msg.includes('shida') || msg.includes('kazi')) {
+  
+  // 7. TEKNOLOJIA & AI
+  else if (msg.match(/\b(ai|tech|computer|phone|internet|coding|program|chatgpt|bot|robot)\b/)) {
     const replies = [
-      "Pole sana mkuu 😔 Maisha ndivyo yalivyo. Pumzika kidogo. Niko hapa kukusikiliza",
-      "Stress achana nayo. Njoo tucheke kidogo. Unataka nikupe story?",
-      "Kazi inachosha sana. Jipe break mkuu. Ustawi wa akili muhimu",
-      "Shida zipite tu. Kesho ni siku nyingine. Usijali sana"
+      "Tech is the future! 😎 Are you into coding or just a user? I can chat about anything tech",
+      "AI kama mimi ni wazuri sana 😂 Unataka nijibu nini kuhusu teknolojia?",
+      "Internet imeharibu watu 😂 Lakini pia imetusaidia. Wewe unatumiaje mtandao?",
+      "Coding ni ngumu lakini tamu. Unajifunza program gani?"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'tech';
   }
-  else if (msg.includes('asante') || msg.includes('shukran') || msg.includes('thanks')) {
-    response = "Karibu sana mkuu 😊 Tupo pamoja. Usisite kuniandikia tena";
+  
+  // 8. SOKA & MICHEZO - KWA WOTE
+  else if (msg.match(/\b(football|soccer|soka|mpira|simba|yanga|arsenal|man u|barcelona|game|sport)\b/)) {
+    const replies = [
+      "Football is life! ⚽ Which team do you support? Don't say you don't watch 😂",
+      "Aisee soka balaa 😂 EPL au La Liga? Mimi ni team Arsenal damu. Wewe?",
+      "Simba vs Yanga ni vita ya Tanzania 😂 Wewe uko upande gani?",
+      "Michezo inapunguza stress. Unaenda gym au unapenda kuangalia tu?"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'sports';
   }
-  else if (msg.includes('bye') || msg.includes('lala') || msg.includes('usiku mwema')) {
-    response = "Usiku mwema mkuu. Lala salama. Tutaonana kesho 😴";
+  
+  // 9. CHAKULA & UTALII
+  else if (msg.match(/\b(food|chakula|eat|kula|travel|utalii|trip|vacation|likizo|njaa)\b/)) {
+    const replies = [
+      "Food is life! 🍕 What's your favorite dish? I love pilau 😂",
+      "Traveling broadens the mind ✈️ Where's your dream destination?",
+      "Njaa inaua mkuu 😂 Umekula nini leo? Nipe wazo nichague cha kula",
+      "Utalii ni mzuri. Tanzania tuna Serengeti, Zanzibar. Wewe umetembelea wapi?"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'food_travel';
   }
-  else if (msg.includes('poa') || msg.includes('safi') || msg.includes('freshi') || msg.includes('sawa')) {
-    response = "Safi sana 😂 Tuko pamoja. Endelea kufurahia siku yako";
+  
+  // 10. DINI & MAADILI
+  else if (msg.match(/\b(god|mungu|allah|jesus|religion|dini|church|msikiti|pray|kuomba|bible|quran)\b/)) {
+    const replies = [
+      "Faith is personal and important 🙏 Whatever you believe, respect is key. How can I help?",
+      "Mungu ni mwema wakati wote 🙏 Una swali la kiroho au tuongee tu?",
+      "Religion brings peace to many. Wewe unapata nguvu gani kutoka kwa imani yako?",
+      "Kuomba ni vizuri sana. Umeomba leo? Nipo kukusikiliza bila kuhukumu"
+    ];
+    response = replies[Math.floor(Math.random() * replies.length)];
+    userTopics[sender_psid] = 'religion';
   }
+  
+  // 11. NDIO / HAPANA / SAWA - CONTEXT AWARE
+  else if (msg.match(/^(ndio|ndiyo|yes|yeah|yep|hapana|no|nah|sawa|poa|ok|okay)$/)) {
+    const topic = userTopics[sender_psid];
+    if (topic === 'story' || lastMsg.includes('story') || lastMsg.includes('utani')) {
+      response = "Haya 😂 Ngoja nyingine: Mwalimu aliuliza '1+1=?' Mwanafunzi: 'Dirisha mwalimu' 😂😂";
+    } else if (topic === 'love') {
+      response = "Sawa 😊 Mapenzi yana changamoto. Unataka ushauri zaidi au tuache hapa?";
+    } else if (msg.includes('no') || msg.includes('hapana')) {
+      response = "Sawa hakuna shida 😊 Tuongee kingine? Unapenda tuzungumze nini?";
+    } else {
+      response = "Poa mkuu 😊 Tuendelee. Kuna kitu kingine unataka tujadili?";
+    }
+  }
+  
+  // 12. ASANTE & KWAHERI
+  else if (msg.match(/\b(thanks|thank you|asante|shukran|bye|goodbye|lala|kwaheri)\b/)) {
+    if (msg.includes('bye') || msg.includes('lala') || msg.includes('kwaheri')) {
+      response = "Take care! 👋 Come back anytime. I'll be here. Have a great day/night!";
+    } else {
+      response = "You're very welcome! 😊 I'm always here if you need to chat. Anything else?";
+    }
+  }
+  
+  // 13. DEFAULT - GENIUS WA KUJIBU CHOCHOTE
   else {
     const replies = [
-      "Aisee mkuu 😂 Nimekusikia. Nambie tena kidogo nielewe vizuri",
-      "Duh umenichanganya kiasi. Ongea lugha ya mtaani nielewe chap",
-      "Sijasoma vizuri hapo. Rudia tena mkuu",
-      "Nipo hapa mkuu. Tuongee tu kama marafiki. Unasemaje?"
+      "That's interesting! 🤔 Tell me more. I want to understand you better",
+      "Aisee 😅 Sijaelewa vizuri. Unaweza nieleze kwa maneno mengine?",
+      "I'm listening 👂 You can talk to me about anything - work, life, love, stress. What's up?",
+      "Nimekusikia mkuu 😊 Lakini nieleze zaidi. Unataka story, ushauri, au tuongee tu?",
+      "Every person is different, so I adapt 😎 Tuongee chochote unachotaka. What's on your mind?"
     ];
     response = replies[Math.floor(Math.random() * replies.length)];
   }
@@ -122,7 +212,6 @@ async function handleMessage(sender_psid, msg) {
   await callSendAPI(sender_psid, response);
 }
 
-// Tuma Jibu Messenger
 async function callSendAPI(sender_psid, response) {
   const request_body = {
     recipient: { id: sender_psid },
@@ -136,4 +225,4 @@ async function callSendAPI(sender_psid, response) {
   }
 }
 
-app.listen(PORT, () => console.log(`Kapela Mtaani yuko Live - Port ${PORT}`));
+app.listen(PORT, () => console.log(`Kapela V3.0 Dunia Nzima yuko Live - Port ${PORT}`));
