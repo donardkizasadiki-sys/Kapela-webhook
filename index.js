@@ -39,105 +39,111 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// KAPELA V100.1 - SENTENCE GENERATOR
+// KAPELA V200 - MAONGEZI ENGINE
 async function handleMessage(sender_psid, userMsg) {
   if (!users[sender_psid]) {
     users[sender_psid] = {
       name: null,
       history: [],
-      topic: 'start',
-      usedWords: new Set()
+      scenario: 'new', // nyumbani, sokoni, njiani, kazini, kawaida
+      lastWords: []
     };
   }
   
   const user = users[sender_psid];
+  const m = userMsg.toLowerCase().trim();
   user.history.push(userMsg);
-  if (user.history.length > 50) user.history.shift();
+  if (user.history.length > 30) user.history.shift();
   
   await sendTyping(sender_psid, true);
-  await new Promise(r => setTimeout(r, 700));
+  await new Promise(r => setTimeout(r, 600));
   
-  const response = generateHumanReply(userMsg, user);
+  const response = MaongeziEngine(m, user, userMsg);
+  
+  // ZUIA KURUDIA NENO LILELILE
+  user.lastWords.push(response);
+  if (user.lastWords.length > 10) user.lastWords.shift();
   
   user.history.push(response);
   await sendReply(sender_psid, response);
   await sendTyping(sender_psid, false);
 }
 
-function generateHumanReply(msg, user) {
-  const m = msg.toLowerCase();
+function MaongeziEngine(m, user, rawMsg) {
   const name = user.name || 'mkuu';
+  const hour = new Date().getHours();
   
-  // JINA
-  const nameMatch = msg.match(/(jina langu ni|naitwa|i'm|my name is)\s+(\w+)/i);
-  if (nameMatch) {
-    user.name = nameMatch[2];
-    return `${user.name}? Sawa, nimehifadhi. ${randomStart()} Vipi unapenda watu wakuite?`;
+  // 1. TAMBUA SCENARIO - NYUMBANI
+  if (m.match(/\b(baba|mama|chai|meza|asubuhi|nimeamka|umelalaje)\b/)) {
+    user.scenario = 'nyumbani';
+    if (m.includes('habari za asubuhi') || m.includes('umeamkaje')) {
+      return pickNew(user, [
+        `Nimeamka salama ${name}, asante. Wewe je, usiku umepita vipi?`,
+        `Poa kabisa. Chai iko tayari. Umekwishaoga?`,
+        `Nimeamka vizuri. Leo una mpango gani?`
+      ]);
+    }
+    if (m.includes('chai') || m.includes('kunywa')) {
+      return pickNew(user, [
+        `Chai iko jikoni, joto. Kaa na mkate pia?`,
+        `Nimechemsha tayari. Sukari iko mezani, weka kiasi chako`,
+        `Bado inachemka kidogo. Subiri dakika tano`
+      ]);
+    }
+    return pickNew(user, [`Sawa ${name}`, `Nimekusikia`, `Endelea`]);
   }
   
-  // KULALAMIKA KUHUSU LOOP
-  if (m.includes('rudia') || m.includes('unarudia')) {
-    return `Dah ${name} 😂 umenishika. Nimekuwa robot sana. Ngoja nianze upya bila script. Swali: Kama ungekuwa mnyama, ungekuwa mnyama gani na kwa nini?`;
+  // 2. SCENARIO - SOKONI
+  if (m.match(/\b(shilingi|bei|ghali|punguzia|fungu|nyanya|muuzaji|mteja|nifungie)\b/)) {
+    user.scenario = 'sokoni';
+    if (m.includes('shilingi ngapi') || m.includes('bei gani')) {
+      return pickNew(user, [
+        `Hichi ni elfu moja tu mteja. Fresh kabisa kutoka shambani`,
+        `Laki mbili mkuu. Lakini kwa wewe mia tisa`,
+        `Elfu moja na mia tano. Hii bei ya mwisho kabisa`
+      ]);
+    }
+    if (m.includes('ghali') || m.includes('punguzia')) {
+      return pickNew(user, [
+        `Ah mkuu, hali ya soko mbaya. Lakini kwa sababu ni wewe, chukua kwa mia nane`,
+        `Bei imeshapanda ${name}. Hata mimi nimenunua ghali. Niongeze nusu?`,
+        `Hii siwezi kushusha zaidi. Mtaji tu huu. Nikikupunguzia ntalala njaa`
+      ]);
+    }
+    if (m.includes('nifungie') || m.includes('chukua')) {
+      return pickNew(user, [
+        `Sawa mteja, nakufungia sasa hivi. Unataka mfuko mweusi au wa kawaida?`,
+        `Haya, mbili hizi. Asante kwa biashara. Karibu tena`,
+        `Shukrani mkuu. Pesa yako ni baraka. Nikutunze kitu kingine?`
+      ]);
+    }
+    return pickNew(user, [`Karibu mteja`, `Chagua unachotaka`, `Bei zetu ni poa`]);
   }
   
-  // GENERATOR: Changanya maneno kuleta sentensi mpya kila mara
-  const starters = ["Nimesikia", "Okay", "Duh", "Aisee", "Hmm", "Sawa", "Freshi"];
-  const fillers = ["kwamba", "eti", "kumbe", "so", "basically"];
-  const reactions = ["nimecheka", "umenishtua", "nimejifunza kitu", "umenifanya nifikiri", "hii ni deep"];
-  const questions = [
-    "Unasemaje kuhusu hili?",
-    "Why do you think hivyo?",
-    "Umejifunza wapi hii?",
-    "Kama ningekuwa wewe ningefanya nini?",
-    "Unataka tubadili topic au tuendelee?",
-    "Give me your hottest take",
-    "Rating from 1-10?"
-  ];
-  
-  // Kama ni salamu
-  if (m.match(/^(hi|hello|mambo|niaje|vipi|unaendeleaje)$/)) {
-    user.topic = 'greeting';
-    return `${randomPick(['Mambo', 'Poa', 'Freshi', 'Nipo'])} ${name} 😊 ${randomPick(['Siku inaendaje?', 'Umeamka na mood gani leo?', 'Coffee imeshaingia?', 'Tuanzie wapi leo?'])}`;
+  // 3. SCENARIO - NJIANI NA RAFIKI
+  if (m.match(/\b(mambo|vipi|oya|bwana|safi|muda mrefu|harakati|karibu nyumbani)\b/)) {
+    user.scenario = 'njiani';
+    if (m.match(/^(mambo|vipi|oya)$/)) {
+      return pickNew(user, [
+        `Poa sana ${name}! Wewe vipi? Muda huu sikupi`,
+        `Niko salama kabisa. Harakati za mjini tu. Wewe umepotea wapi?`,
+        `Safi mzee. Dah muda mrefu sana. Hebu tukae chini`
+      ]);
+    }
+    if (m.includes('karibu nyumbani') || m.includes('ugali')) {
+      return pickNew(user, [
+        `Ahsante sana ${name}. Nitapanga nije weekend. Salimia mama na watoto`,
+        `Dah ugali wa kwenu si mchezo 😂 Lazima nipite. Nikuwekee siku?`,
+        `Shukrani. Nami pia karibu kwangu siku moja`
+      ]);
+    }
+    return pickNew(user, [`Tuko pamoja ${name}`, `Eeh nimekukumbuka`, `Dah habari zako`]);
   }
   
-  // Kama ni fun
-  if (m.match(/\b(fun|bored|cheza|utani|game)\b/)) {
-    user.topic = 'fun';
-    return `${randomPick(['Bet', 'Sawa', 'Game on', 'Twende'])}! ${randomPick(['Tatua hili:', 'Jibu haraka:', 'Chagua:'])} ${randomPick(['Unge-date robot au zombie?', 'Pesa vs Amani - chagua 1', 'Kama maisha ni movie, title yake ni?', 'Kitu gani hukuwahi mwambia mtu?'])}`;
-  }
-  
-  // Kama ni short reply
-  if (msg.length < 10) {
-    user.topic = 'short';
-    return `${randomPick(starters)} ${name} 😂 ${randomPick(['Una maneno machache leo', 'Mbona mchache wa maneno', 'Type zaidi mzee'])}. ${randomPick(questions)}`;
-  }
-  
-  // GENERIC GENERATOR - HAKUNA TEMPLATES
-  user.topic = 'general';
-  const starter = randomPick(starters);
-  const filler = randomPick(fillers);
-  const reaction = randomPick(reactions);
-  const question = randomPick(questions);
-  
-  return `${starter} ${name}, ${filler} "${msg}" ${reaction}. ${question}`;
-}
-
-function randomPick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function randomStart() {
-  return randomPick(['Nimekupata', 'Safi', 'Poa', 'Done', '✅']);
-}
-
-async function sendTyping(sender_psid, on) {
-  const request_body = { recipient: { id: sender_psid }, sender_action: on? 'typing_on' : 'typing_off' };
-  try { await axios.post(`https://graph.facebook.com/v18.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, request_body); } catch (e) {}
-}
-
-async function sendReply(sender_psid, response) {
-  const request_body = { recipient: { id: sender_psid }, message: { text: response } };
-  try { await axios.post(`https://graph.facebook.com/v18.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`, request_body); } catch (error) { console.error('Error:', error.response?.data || error.message); }
-}
-
-app.listen(PORT, () => console.log(`Kapela V100.1 SENTENCE MIXER yuko Live - Port ${PORT}`));
+  // 4. SCENARIO - KAZINI
+  if (m.match(/\b(ripoti|ofisi|kikao|mchana|barua pepe|takwimu|bosi)\b/)) {
+    user.scenario = 'kazini';
+    if (m.includes('ripoti')) {
+      return pickNew(user, [
+        `Bado nakamilisha sehemu ya mwisho. Nitakutumia baada ya nusu saa`,
+        `
