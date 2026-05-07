@@ -1,16 +1,21 @@
 {
-  "name": "kapela-bot",
-  "version": "1.0.0",
+  "name": "kapela-v500",
+  "version": "5.0.0",
+  "description": "Kapela V500 Street Professor - Maongezi ya Ukweli",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "express": "^4.18.2",
     "body-parser": "^1.20.2",
     "axios": "^1.6.0"
   },
-  "engines": {
-    "node": "18.x"
-  }
+  "keywords": ["whatsapp", "messenger", "bot", "swahili", "kapela"],
+  "author": "Wilondja",
+  "license": "MIT"
 }
