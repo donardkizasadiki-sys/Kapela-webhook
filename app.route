@@ -1,9 +1,0 @@
-@app.route('/delete-data')
-def delete_data():
-    return '''
-    <h1>Delete Your Data - Kapela Bot</h1>
-    <p>To delete all your data from Kapela Bot:</p>
-    <p>1. WhatsApp: Send "DELETE" to +255756769086</p>
-    <p>2. Email: kapelawilondja@gmail.com</p>
-    <p>We will delete within 24 hours.</p>
-    '''
