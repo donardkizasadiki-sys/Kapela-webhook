@@ -2,28 +2,12 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-# Hii ni route yako ya webhook iliyopo
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    # Hapa weka code yako ya webhook ya sasa
-    # Usifute code yako iliyopo ya webhook
-    verify_token = "KAPELA_TOKEN_YAKO"
-    
-    if request.method == 'GET':
-        mode = request.args.get('hub.mode')
-        token = request.args.get('hub.verify_token')
-        challenge = request.args.get('hub.challenge')
-        
-        if mode and token:
-            if mode == 'subscribe' and token == verify_token:
-                return challenge, 200
-            else:
-                return 'Forbidden', 403
-    
+    # code yako ya webhook...
     return 'OK', 200
 
-# HII NDIO ROUTE MPYA YA DELETE DATA
-@app.route('/delete-data')
+@app.route('/delete-data')  # HII NDIO SAHIHI
 def delete_data():
     return '''
     <html>
@@ -39,4 +23,4 @@ def delete_data():
     '''
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
