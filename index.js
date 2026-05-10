@@ -3,6 +3,7 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+// 1. PRIVACY POLICY PAGE
 app.get('/', (req, res) => {
   res.type('text/plain');
   res.send(`Kapela Bot - Privacy Policy
@@ -29,22 +30,29 @@ Business: Wilondja Kapela Kapela
 Address: Kigoma, Tanzania
 Phone: +255762237432
 Email: Kapelawilondja@gmail.com
-Last Updated: May 9, 2026`);
+Last Updated: May 10, 2026`);
 });
 
+// 2. WEBHOOK VERIFICATION - Meta huita hapa ku-verify
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
+
   if (mode === 'subscribe' && token === process.env.VERIFY_TOKEN) {
+    console.log('WEBHOOK_VERIFIED');
     res.status(200).send(challenge);
   } else {
     res.sendStatus(403);
   }
 });
 
+// 3. WEBHOOK KU-POKEA UJUMBE
 app.post('/webhook', async (req, res) => {
   try {
+    // Rudisha 200 mapema Meta asikate tamaa
+    res.sendStatus(200);
+
     if (req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
       const message = req.body.entry[0].changes[0].value.messages[0];
       const from = message.from;
@@ -61,21 +69,25 @@ app.post('/webhook', async (req, res) => {
         reply_text = "POA MKUU 🔥 Niko poa. Nikusaidie nini leo?";
       }
 
-      await axios.post(`https://graph.facebook.com/v20.0/${process.env.PHONE_NUMBER_ID}/messages`, {
+      // TUMA JIBU KWA WHATSAPP - SYSTEM USER TOKEN
+      await axios.post(`https://graph.facebook.com/v20.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
         messaging_product: "whatsapp",
         to: from,
         text: { body: reply_text }
       }, {
-        headers: { 'Authorization': `Bearer ${process.env.WHATSAPP_TOKEN}` }
+        headers: {
+          'Authorization': `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`, // 👈 SYSTEM USER TOKEN HAPA
+          'Content-Type': 'application/json'
+        }
       });
+      console.log(`Jibu limetumwa kwa ${from}`);
     }
-    res.sendStatus(200);
   } catch (error) {
-    console.error('Error:', error.response?.data || error.message);
-    res.sendStatus(200);
+    console.error('Error kutuma message:', error.response?.data || error.message);
   }
 });
 
+// 4. DELETE DATA PAGE
 app.get('/delete-data', (req, res) => {
   res.send(`<html>
 <head><title>Delete Data - Kapela Bot</title></head>
@@ -96,4 +108,4 @@ app.get('/delete-data', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Live'));
+app.listen(PORT, () => console.log(`Kapela Bot Live on ${PORT}`));
