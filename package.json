@@ -1,7 +1,6 @@
 {
-  "name": "kapela-bot-live",
+  "name": "kapela-webhook",
   "version": "1.0.0",
-  "description": "WhatsApp Bot for Wilondja Kapela Kapela",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -9,8 +8,5 @@
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.6.0"
-  },
-  "engines": {
-    "node": "18.x"
   }
 }
