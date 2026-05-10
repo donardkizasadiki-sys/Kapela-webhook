@@ -1,7 +1,7 @@
 {
-  "name": "kapela-webhook",
+  "name": "kapela-bot-final",
   "version": "1.0.0",
-  "description": "Kapela Bot WhatsApp Webhook",
+  "description": "Kapela WhatsApp Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
