@@ -78,3 +78,22 @@ app.post('/webhook', async (req, res) => {
 
 app.get('/delete-data', (req, res) => {
   res.send(`<html>
+<head><title>Delete Data - Kapela Bot</title></head>
+<body style="font-family:Arial;padding:40px;max-width:600px;margin:auto;">
+  <h1>Data Deletion Request - Kapela Bot</h1>
+  <p>Wilondja Kapela Kapela respects your privacy.</p>
+  <h2>Jinsi ya Kufuta Data Yako:</h2>
+  <p>1. Tuma "DELETE MY DATA" kwa WhatsApp: +255762237432</p>
+  <p>2. Au email: <strong>Kapelawilondja@gmail.com</strong> na subject "DELETE MY DATA"</p>
+  <p>Tutafuta data yako yote ndani ya masaa 24.</p>
+  <hr>
+  <p><strong>Business:</strong> Wilondja Kapela Kapela<br>
+  <strong>Location:</strong> Kigoma, Tanzania<br>
+  <strong>Phone:</strong> +255762237432<br>
+  <strong>Email:</strong> Kapelawilondja@gmail.com</p>
+</body>
+</html>`);
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('Live'));
