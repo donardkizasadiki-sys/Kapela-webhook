@@ -3,11 +3,40 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+// 1. PRIVACY POLICY - HII NDIO META ANAANGALIA KWANZA
+app.get('/', (req, res) => {
+  res.type('text/plain');
+  res.send(`Kapela Bot - Privacy Policy
+
+Wilondja Kapela Kapela respects your privacy.
+
+1. DATA TUNAKUSANYA
+Tunakusanya namba yako ya WhatsApp na ujumbe unaotuma kwa Kapela Bot.
+
+2. KWA NINI TUNAKUSANYA
+Tunatumia data yako kujibu maswali yako tu. Hatutumi kwa marketing au matangazo.
+
+3. TUNAWEKA WAPI
+Data inahifadhiwa salama kwenye server za Render.com. Hatushare na kampuni nyingine yoyote.
+
+4. HAKI YAKO
+Unaweza kuomba data yako ifutwe wakati wowote:
+   a) Tuma "DELETE MY DATA" kwa WhatsApp number yetu
+   b) Au email: wilondja@example.com na subject "DELETE MY DATA"
+   Tutafuta data yako yote ndani ya masaa 24.
+
+5. MAWASILIANO
+Business: Wilondja Kapela Kapela
+Address: Dar es Salaam, Tanzania 
+Email: wilondja@example.com
+Last Updated: May 9, 2026`);
+});
+
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'kapela2026';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// 1. HII NDIO META ANAITAJI KWA VERIFY WEBHOOK
+// 2. WEBHOOK VERIFICATION - KWA META
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -21,7 +50,7 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// 2. HII NI YA KUPOKEA MESSAGES NA KURUDISHA JIBU AUTOMATIC
+// 3. KUPOKEA MESSAGES NA KUJIBU AUTOMATIC
 app.post('/webhook', async (req, res) => {
   try {
     const body = req.body;
@@ -70,37 +99,3 @@ app.post('/webhook', async (req, res) => {
       );
 
       console.log('Jibu limetumwa kwa:', from);
-    }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error('Error:', error.response?.data || error.message);
-    res.sendStatus(500);
-  }
-});
-
-// 3. DATA DELETION PAGE - KWA APP REVIEW
-app.get('/delete-data', (req, res) => {
-  res.send(`
-    <html>
-      <head><title>Delete Data - Kapela Bot</title></head>
-      <body style="font-family: Arial; padding: 40px;">
-        <h1>Kapela Bot - Data Deletion Request</h1>
-        <p>Wilondja Kapela Kapela respects your privacy.</p>
-        <h3>How to delete your data:</h3>
-        <p>1. Send "DELETE MY DATA" to our WhatsApp number</p>
-        <p>2. Or email: wilondja@example.com with subject "DELETE MY DATA"</p>
-        <p>3. We will delete all your data within 24 hours</p>
-        <p>Business: Wilondja Kapela Kapela, Dar es Salaam, Tanzania</p>
-      </body>
-    </html>
-  `);
-});
-
-// 4. HOME PAGE
-app.get('/', (req, res) => {
-  res.send('KAPELA BOT LIVE - WhatsApp Business API');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
