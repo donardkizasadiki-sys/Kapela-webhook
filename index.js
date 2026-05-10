@@ -20,14 +20,14 @@ Data inahifadhiwa salama kwenye server za Render.com. Hatushare na kampuni nying
 
 4. HAKI YAKO
 Unaweza kuomba data yako ifutwe wakati wowote:
-   a) Tuma "DELETE MY DATA" kwa WhatsApp number yetu
-   b) Au email: wilondja@example.com na subject "DELETE MY DATA"
+   a) Tuma "DELETE MY DATA" kwa WhatsApp number yetu +255762237432
+   b) Au email: kapelawilondja@gmail.com na subject "DELETE MY DATA"
    Tutafuta data yako yote ndani ya masaa 24.
 
 5. MAWASILIANO
 Business: Wilondja Kapela Kapela
 Address: Dar es Salaam, Tanzania
-Email: wilondja@example.com
+Email: kapelawilondja@gmail.com
 Last Updated: May 9, 2026`);
 });
 
@@ -53,7 +53,7 @@ app.post('/webhook', async (req, res) => {
       let reply_text = "MAMBO MKUU 🔥 Karibu sana Kapela Bot. Nisaidie nini leo?";
 
       if (msg_body.includes('delete my data') || msg_body.includes('futa data')) {
-        reply_text = `Kufuta data yako:\n\n1. Email: wilondja@example.com\n2. Link: https://kapela-bot-live.onrender.com/delete-data\n\nTutafuta ndani ya masaa 24 ✅`;
+        reply_text = `Kufuta data yako:\n\n1. Email: kapelawilondja@gmail.com\n2. Link: https://kapela-bot-live.onrender.com/delete-data\n\nTutafuta ndani ya masaa 24 ✅`;
       } else if (msg_body.includes('bei') || msg_body.includes('price') || msg_body.includes('gharama')) {
         reply_text = `BEI ZA KAPELA BOT 🔥\n\n1. Package Ndogo: TZS 50,000/mwezi\n2. Package Kati: TZS 100,000/mwezi\n3. Package Kubwa: TZS 200,000/mwezi\n\nPiga 0762 237 432 kupata ofa 🔥`;
       } else if (msg_body.includes('mambo') || msg_body.includes('habari') || msg_body.includes('vipi')) {
