@@ -83,12 +83,12 @@ app.get('/delete-data', (req, res) => {
   <p>Wilondja Kapela Kapela respects your privacy.</p>
   <h2>Jinsi ya Kufuta Data Yako:</h2>
   <p>1. Tuma "DELETE MY DATA" kwa WhatsApp number yetu</p>
-  <p>2. Au email: <strong>wilondja@example.com</strong> na subject "DELETE MY DATA"</p>
+  <p>2. Au email: <strong>kapelawilondja.com</strong> na subject "DELETE MY DATA"</p>
   <p>Tutafuta data yako yote ndani ya masaa 24.</p>
   <hr>
   <p><strong>Business:</strong> Wilondja Kapela Kapela<br>
   <strong>Location:</strong> Dar es Salaam, Tanzania<br>
-  <strong>Email:</strong> wilondja@example.com</p>
+  <strong>Email:</strong> kapelawilondja@gmail.com</p>
 </body>
 </html>`);
 });
