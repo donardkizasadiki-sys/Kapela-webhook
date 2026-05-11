@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 Wilondja Kapela Kapela respects your privacy.
 
 1. DATA TUNAKUSANYA
-Tunakusanya namba yako ya WhatsApp na ujumbe unaotuma kwa Kapela Bot.
+Tunakusanya namba yako ya WhatsApp/Facebook na ujumbe unaotuma kwa Kapela Bot.
 
 2. KWA NINI TUNAKUSANYA
 Tunatumia data yako kujibu maswali yako tu. Hatutumi kwa marketing au matangazo.
@@ -105,6 +105,59 @@ app.get('/delete-data', (req, res) => {
   <strong>Email:</strong> Kapelawilondja@gmail.com</p>
 </body>
 </html>`);
+});
+
+// 5. MESSENGER WEBHOOK VERIFICATION - MPYA
+app.get('/webhook/messenger', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  if (mode === 'subscribe' && token === process.env.MESSENGER_VERIFY_TOKEN) {
+    console.log('MESSENGER_WEBHOOK_VERIFIED');
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+// 6. MESSENGER WEBHOOK KU-POKEA UJUMBE - MPYA
+app.post('/webhook/messenger', async (req, res) => {
+  try {
+    res.sendStatus(200);
+
+    if (req.body.object === 'page') {
+      for (const entry of req.body.entry) {
+        const webhook_event = entry.messaging[0];
+        const sender_psid = webhook_event.sender.id;
+
+        if (webhook_event.message && webhook_event.message.text) {
+          const msg_body = webhook_event.message.text.toLowerCase();
+          console.log(`Messenger Message kutoka ${sender_psid}: ${msg_body}`);
+
+          let reply_text = "MAMBO MKUU 🔥 Karibu sana Kapela Bot. Nisaidie nini leo?";
+
+          if (msg_body.includes('delete my data') || msg_body.includes('futa data')) {
+            reply_text = `Kufuta data yako:\n\n1. Email: Kapelawilondja@gmail.com\n2. WhatsApp: +255762237432\n3. Link: https://kapela-bot-live.onrender.com/delete-data\n\nTutafuta ndani ya masaa 24 ✅`;
+          } else if (msg_body.includes('bei') || msg_body.includes('price') || msg_body.includes('gharama')) {
+            reply_text = `BEI ZA KAPELA BOT 🔥\n\n1. Package Ndogo: TZS 50,000/mwezi\n2. Package Kati: TZS 100,000/mwezi\n3. Package Kubwa: TZS 200,000/mwezi\n\nPiga +255762237432 kupata ofa 🔥`;
+          } else if (msg_body.includes('mambo') || msg_body.includes('habari') || msg_body.includes('vipi')) {
+            reply_text = "POA MKUU 🔥 Niko poa. Nikusaidie nini leo?";
+          }
+
+          await axios.post(`https://graph.facebook.com/v20.0/me/messages`, {
+            recipient: { id: sender_psid },
+            message: { text: reply_text }
+          }, {
+            params: { access_token: process.env.MESSENGER_PAGE_ACCESS_TOKEN }
+          });
+          console.log(`Jibu la Messenger limetumwa kwa ${sender_psid}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error Messenger:', error.response?.data || error.message);
+  }
 });
 
 const PORT = process.env.PORT || 3000;
